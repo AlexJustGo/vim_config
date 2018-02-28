@@ -1,0 +1,185 @@
+" -----------------------------------------------------------------------------
+"  < Vundle 插件管理工具配置 >
+" -----------------------------------------------------------------------------
+" 用于更方便的管理vim插件，具体用法参考 :h vundle 帮助
+" 安装方法为在终端输入如下命令
+"git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim 
+
+set nocompatible                                      "禁用 Vi 兼容模式
+filetype off                                          "必须  
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+
+" 使用Vundle来管理，这个必须要有。
+Plugin 'VundleVim/Vundle.vim'
+
+" 以下为要安装或更新的插件，不同仓库都有（具体书写规范请参考帮助）
+Plugin 'a.vim'
+Plugin 'jiangmiao/auto-pairs'
+Plugin 'bufexplorer.zip'
+Plugin 'ccvext.vim'
+Plugin 'cSyntaxAfter'
+Plugin 'Yggdroot/indentLine'
+Plugin 'Mark--Karkat'
+Plugin 'scrooloose/nerdtree'
+Plugin 'Lokaltog/vim-powerline'
+Plugin 'repeat.vim'
+Plugin 'wesleyche/SrcExpl'
+Plugin 'tpope/vim-surround'
+" Plugin 'scrooloose/syntastic'  "与YCM冲突，如果不装YCM则启用它
+Plugin 'tagbar'
+Plugin 'taglist.vim'
+Plugin 'TxtBrowser'
+Plugin 'autoload_cscope.vim'
+Plugin 'rdnetto/YCM-Generator'
+Plugin 'YouCompleteMe'
+
+call vundle#end()                "必须
+filetype plugin indent on        "必须 加载VIM自带的和插件相应的语法和文件类型相关脚本
+" =============================================================================
+"                          << 以下为常用插件配置 >>
+" =============================================================================
+
+" -----------------------------------------------------------------------------
+"  < a.vim 插件配置 >
+" -----------------------------------------------------------------------------
+" 用于切换C/C++头文件
+" :A     ---切换头文件并独占整个窗口
+" :AV    ---切换头文件并垂直分割窗口
+" :AS    ---切换头文件并水平分割窗口
+
+" -----------------------------------------------------------------------------
+"  < auto-pairs 插件配置 >
+" -----------------------------------------------------------------------------
+" 用于括号与引号自动补全
+
+" -----------------------------------------------------------------------------
+"  < BufExplorer 插件配置 >
+" -----------------------------------------------------------------------------
+" 快速轻松的在缓存中切换（相当于另一种多个文件间的切换方式）
+" <Leader>be 在当前窗口显示缓存列表并打开选定文件
+" <Leader>bs 水平分割窗口显示缓存列表，并在缓存列表窗口中打开选定文件
+" <Leader>bv 垂直分割窗口显示缓存列表，并在缓存列表窗口中打开选定文件
+
+noremap <c-k> <c-w>k
+noremap <c-j> <c-w>j
+noremap <c-h> <c-w>h
+noremap <c-l> <c-w>l
+
+" -----------------------------------------------------------------------------
+"  < ccvext.vim 插件配置 >
+" -----------------------------------------------------------------------------
+" 用于对指定文件自动生成tags与cscope文件并连接
+" 如果是Linux系统, 则生成的文件在~/.symbs/目录下
+" 具体用法可参考www.vim.org中此插件的说明
+" <Leader>sy 自动生成tags与cscope文件并连接
+" <Leader>sc 连接已存在的tags与cscope文件
+
+" -----------------------------------------------------------------------------
+"  < cSyntaxAfter 插件配置 >
+" -----------------------------------------------------------------------------
+" 高亮括号与运算符等
+au! BufRead,BufNewFile,BufEnter *.{c,cpp,h,java,javascript} call CSyntaxAfter()
+
+" -----------------------------------------------------------------------------
+"  < indentLine 插件配置 >
+" -----------------------------------------------------------------------------
+" 用于显示对齐线，与 indent_guides 在显示方式上不同，根据自己喜好选择了
+" 在终端上会有屏幕刷新的问题，这个问题能解决有更好了
+" 开启/关闭对齐线
+nmap <leader>il :IndentLinesToggle<CR>
+
+" 设置终端对齐线颜色，如果不喜欢可以将其注释掉采用默认颜色
+let g:indentLine_color_term = 239
+
+" -----------------------------------------------------------------------------
+"  < Mark--Karkat（也就是 Mark） 插件配置 >
+" -----------------------------------------------------------------------------
+" 给不同的单词高亮，表明不同的变量时很有用，详细帮助见 :h mark.txt
+
+" -----------------------------------------------------------------------------
+"  < nerdtree 插件配置 >
+" -----------------------------------------------------------------------------
+" 有目录村结构的文件浏览插件
+
+" 常规模式下输入 F2 调用插件
+nmap <F2> :NERDTreeToggle<CR>
+
+" -----------------------------------------------------------------------------
+"  < repeat 插件配置 >
+" -----------------------------------------------------------------------------
+" 主要用"."命令来重复上次插件使用的命令
+
+" -----------------------------------------------------------------------------
+"  < SrcExpl 插件配置 >
+" -----------------------------------------------------------------------------
+" 增强源代码浏览，其功能就像Windows中的"Source Insight"
+nmap <F3> :SrcExplToggle<CR>                "打开/闭浏览窗口
+
+" -----------------------------------------------------------------------------
+"  < surround 插件配置 >
+" -----------------------------------------------------------------------------
+" 快速给单词/句子两边增加符号（包括html标签），缺点是不能用"."来重复命令
+" 不过 repeat 插件可以解决这个问题，详细帮助见 :h surround.txt
+
+" -----------------------------------------------------------------------------
+"  < Syntastic 插件配置 >
+" -----------------------------------------------------------------------------
+" 用于保存文件时查检语法
+let g:syntastic_cpp_compiler = 'clang++'
+let g:syntastic_cpp_compiler_options = '-std=c++11'
+
+" -----------------------------------------------------------------------------
+"  < Tagbar 插件配置 >
+" -----------------------------------------------------------------------------
+" 相对 TagList 能更好的支持面向对象
+
+" 常规模式下输入 tb 调用插件，如果有打开 TagList 窗口则先将其关闭
+nmap tb :TagbarToggle<CR>
+
+let g:tagbar_width=30                       "设置窗口宽度
+" let g:tagbar_left=1                         "在左侧窗口中显示
+
+" -----------------------------------------------------------------------------
+"  < txtbrowser 插件配置 >
+" -----------------------------------------------------------------------------
+" 用于文本文件生成标签与与语法高亮（调用TagList插件生成标签，如果可以）
+au BufRead,BufNewFile *.txt setlocal ft=txt
+
+" -----------------------------------------------------------------------------
+"  < YouCompleteMe 插件配置 >
+" -----------------------------------------------------------------------------
+" 自动补全配置
+set completeopt=longest,menu    "让Vim的补全菜单行为与一般IDE一致(参考VimTip1228)
+autocmd InsertLeave * if pumvisible() == 0|pclose|endif "离开插入模式后自动关闭预览窗口
+inoremap <expr> <CR>       pumvisible() ? "\<C-y>" : "\<CR>"    "回车即选中当前项
+"上下左右键的行为 会显示其他信息
+inoremap <expr> <Down>     pumvisible() ? "\<C-n>" : "\<Down>"
+inoremap <expr> <Up>       pumvisible() ? "\<C-p>" : "\<Up>"
+inoremap <expr> <PageDown> pumvisible() ? "\<PageDown>\<C-p>\<C-n>" : "\<PageDown>"
+inoremap <expr> <PageUp>   pumvisible() ? "\<PageUp>\<C-p>\<C-n>" : "\<PageUp>"
+
+"youcompleteme  默认tab  s-tab 和自动补全冲突
+"let g:ycm_key_list_select_completion=['<c-n>']
+let g:ycm_key_list_select_completion = ['<Down>']
+"let g:ycm_key_list_previous_completion=['<c-p>']
+let g:ycm_key_list_previous_completion = ['<Up>']
+let g:ycm_confirm_extra_conf=0 "关闭加载.ycm_extra_conf.py提示
+
+let g:ycm_collect_identifiers_from_tags_files=1 " 开启 YCM 基于标签引擎
+let g:ycm_min_num_of_chars_for_completion=2 " 从第2个键入字符就开始罗列匹配项
+let g:ycm_cache_omnifunc=0  " 禁止缓存匹配项,每次都重新生成匹配项
+let g:ycm_seed_identifiers_with_syntax=1    " 语法关键字补全
+nnoremap <F5> :YcmForceCompileAndDiagnostics<CR>    "force recomile with syntastic
+"nnoremap <leader>lo :lopen<CR> "open locationlist
+"nnoremap <leader>lc :lclose<CR>    "close locationlist
+inoremap <leader><leader> <C-x><C-o>
+"在注释输入中也能补全
+let g:ycm_complete_in_comments = 1
+"在字符串输入中也能补全
+let g:ycm_complete_in_strings = 1
+"注释和字符串中的文字也会被收入补全
+let g:ycm_collect_identifiers_from_comments_and_strings = 0
+
+nnoremap <leader>jd :YcmCompleter GoToDefinitionElseDeclaration<CR> "
+

@@ -1,0 +1,389 @@
+" =============================================================================
+"                          << 以下为软件默认配置 >>
+" =============================================================================
+
+" -----------------------------------------------------------------------------
+"  < Linux Gvim/Vim 默认配置> 做了一点修改
+" -----------------------------------------------------------------------------
+" Uncomment the following to have Vim jump to the last position when
+" reopening a file
+if has("autocmd")
+    au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+endif
+
+" This line should not be removed as it ensures that various options are
+" properly set to work with the Vim-related packages available in Debian.
+runtime! debian.vim
+
+" Vim5 and later versions support syntax highlighting. Uncommenting the next
+" line enables syntax highlighting by default.
+if has("syntax")
+    syntax on
+endif
+
+set mouse=a                    " 启用鼠标
+set t_Co=256                   " 在终端启用256色
+set backspace=2                " 设置退格键可用
+
+" Source a global configuration file if available
+if filereadable("/etc/vim/vimrc.local")
+    source /etc/vim/vimrc.local
+endif
+
+
+" =============================================================================
+"                          << 以下为用户自定义配置 >>
+" =============================================================================
+
+" -----------------------------------------------------------------------------
+"  < 编码配置 >
+" -----------------------------------------------------------------------------
+" 注：使用utf-8格式后，软件与程序源码、文件路径不能有中文，否则报错
+set encoding=utf-8                                    "设置gvim内部编码
+set fileencoding=utf-8                                "设置当前文件编码
+set fileencodings=ucs-bom,utf-8,gbk,cp936,latin-1     "设置支持打开的文件的编码
+
+" 文件格式，默认 ffs=dos,unix
+set fileformat=dos                                   "设置新文件的<EOL>格式
+set fileformats=unix,dos,mac                          "给出文件的<EOL>格式类型
+
+" -----------------------------------------------------------------------------
+"  < 编写文件时的配置 >
+" -----------------------------------------------------------------------------
+filetype on                                           "启用文件类型侦测
+filetype plugin on                                    "针对不同的文件类型加载对应的插件
+filetype plugin indent on                             "启用缩进
+set smartindent                                       "启用智能对齐方式
+set expandtab                                         "将Tab键转换为空格
+set tabstop=4                                         "设置Tab键的宽度
+set shiftwidth=4                                      "换行时自动缩进4个空格
+set smarttab                                          "指定按一次backspace就删除shiftwidth宽度的空格
+set wrap                                              "自动换行
+set so=5                                              "翻页留5行
+"set foldenable                                        "启用折叠
+"set foldmethod=indent                                 "indent 折叠方式
+
+" 用空格键来开关折叠
+nnoremap <space> @=((foldclosed(line('.')) < 0) ? 'zc' : 'zo')<CR>
+
+" 当文件在外部被修改，自动更新该文件
+set autoread
+
+" 常规模式下输入 cS 清除行尾空格
+nmap cS :%s/\s\+$//g<CR>:noh<CR>
+
+" 常规模式下输入 cM 清除行尾 ^M 符号
+nmap cM :%s/\r$//g<CR>:noh<CR>
+
+" 设置:w!为使用超级用户权限保存
+cmap w!<CR> w !sudo tee > /dev/null %<CR>
+
+" 防止没有松开shift导致麻烦
+cmap Q q
+cmap W w
+cnoremap qq Q
+cnoremap ww W
+
+set hlsearch                                          "高亮搜索
+set incsearch                                         "在输入要搜索的文字时，实时匹配
+set ignorecase                                        "搜索模式里忽略大小写
+set smartcase                                         "如果搜索模式包含大写字符，不使用 'ignorecase' 选项，只有在输入搜索模式并且打开 'ignorecase' 选项时才会使用
+
+" 插入模式下光标移动
+imap <c-k> <Up>
+imap <c-j> <Down>
+imap <c-h> <Left>
+imap <c-l> <Right>
+
+" 长行浏览
+map j gj
+map k gk
+
+" 启用每行超过80列的字符提示（字体变蓝并加下划线），不启用就注释掉
+au BufWinEnter * let w:m2=matchadd('Underlined', '\%>' . 80 . 'v.\+', -1)
+
+" -----------------------------------------------------------------------------
+"  < 界面配置 >
+" -----------------------------------------------------------------------------
+set number                                            "显示行号
+set laststatus=2                                      "启用状态栏信息
+set cmdheight=2                                       "设置命令行的高度为2，默认为1
+set cursorline                                        "突出显示当前行
+
+set background=dark
+colorscheme Tomorrow-Night-Eighties                   "终端配色方案
+""olorscheme molokai
+hi CursorLine term=NONE cterm=NONE ctermbg=240 guibg=none gui=none
+ 
+
+" -----------------------------------------------------------------------------
+"  < 代码文本配置 >
+" -----------------------------------------------------------------------------
+
+"新建.c,.h,.sh文件，自动插入文件头
+autocmd BufNewFile *.cpp,*.[ch] exec ":call HeaderC()"
+autocmd BufNewFile *.sh exec ":call HeaderShell()"
+autocmd Bufnewfile *.py exec ":call HeaderPython()" 
+
+func HeaderC()
+    call setline(1, "/*************************************************************************")
+    call setline(2, " > File Name: ".expand("%"))
+    call setline(3, " > Author: ")
+    call setline(4, " > Email: ")
+    call setline(5, " > Created Time: ".strftime("%c"))
+    call setline(6, "************************************************************************/")
+    call setline(7, "")
+
+    normal G
+endfunc
+
+func HeaderShell()
+    call setline(1,"#########################################################################")
+    call setline(2, "# File Name: ".expand("%"))
+    call setline(3, "# Author: ")
+    call setline(4, "# Email: ")
+    call setline(5, "# Created Time: ".strftime("%c"))
+    call setline(6,"#########################################################################")
+    call setline(7, "#!/bin/bash")
+    call setline(8, "")
+    normal G
+endfunc
+
+func HeaderPython()
+    call setline(1, "#! /usr/bin/env python")
+    call setline(2, "#-*- coding: utf8 -*-")
+    call setline(3, "")
+    call setline(4, "'''")
+    call setline(5, " > File Name: ".expand("%"))
+    call setline(6, " > Author:")
+    call setline(7, " > Email: ")
+    call setline(8, " > Created Time: ".strftime("%c"))
+    call setline(9, "'''")
+    call setline(10, "")
+    call setline(11, "")
+    normal G
+endfunc
+
+" -----------------------------------------------------------------------------
+"  < 单文件编译、连接、运行配置 >
+" -----------------------------------------------------------------------------
+
+" C/C++
+" Ctrl + F5 一键保存、编译、连接存并运行
+map <c-F5> :call Run()<CR>
+imap <c-F5> <ESC>:call Run()<CR>
+
+if expand("%:e") == 'c' || expand("%:e") == 'cpp'
+    " F5 一键保存并编译
+    map <F5> :call Compile()<CR>
+    imap <F5> <ESC>:call Compile()<CR>
+elseif expand("%:e") == 'py'
+    " 如果是Python文档
+    map <F5> :call RunPython()<CR>
+    imap <F5> <ESC>:call RunPython()<CR>
+endif
+
+" Ctrl + F6 一键保存并连接
+map <c-F6> :call Link()<CR>
+imap <c-F6> <ESC>:call Link()<CR>
+
+" F6 一键保存并调试
+map <F6> :call Debug()<CR>
+
+" F7清理编译运行产生的文件
+map <F7> ::call Clear()<CR>
+
+let s:LastShellReturn_C = 0
+let s:LastShellReturn_L = 0
+let s:ShowWarning = 1
+let s:Obj_Extension = '.o'
+let s:Sou_Error = 0
+
+let s:linux_CFlags = 'gcc\ -Wall\ -g\ -O0\ -c\ %\ -o\ %<.o'
+let s:linux_CPPCompileFlags = 'g++\ -Wall\ -g\ -O0\ -c\ %\ -o\ %<.o\ -std=c++14'
+let s:linux_CPPLinkFlags = 'g++\ -o\ %<\ %<.o\ -std=c++14'
+
+func! Compile()
+    exe ":ccl"
+    exe ":update"
+    let s:Sou_Error = 0
+    let s:LastShellReturn_C = 0
+    let Sou = expand("%:p")
+    let v:statusmsg = ''
+    if expand("%:e") == "c" || expand("%:e") == "cpp" || expand("%:e") == "cxx"
+        let Obj = expand("%:p:r").s:Obj_Extension
+        let Obj_Name = expand("%:p:t:r").s:Obj_Extension
+        if !filereadable(Obj) || (filereadable(Obj) && (getftime(Obj) < getftime(Sou)))
+            redraw!
+            if expand("%:e") == "c"
+                exe ":setlocal makeprg=".s:linux_CFlags
+                echohl WarningMsg | echo " compiling..."
+                silent make
+            elseif expand("%:e") == "cpp" || expand("%:e") == "cxx"
+                exe ":setlocal makeprg=".s:linux_CPPCompileFlags
+                echohl WarningMsg | echo " compiling..."
+                silent make
+            endif
+            redraw!
+            if v:shell_error != 0
+                let s:LastShellReturn_C = v:shell_error
+            endif
+            if empty(v:statusmsg)
+                echohl WarningMsg | echo " compilation successful"
+            else
+                exe ":bo cope"
+            endif
+        else
+            echohl WarningMsg | echo ""Obj_Name"is up to date"
+        endif
+    else
+        let s:Sou_Error = 1
+        echohl WarningMsg | echo " please choose the correct source file"
+    endif
+    exe ":setlocal makeprg=make"
+endfunc
+
+func! Link()
+    call Compile()
+    if s:Sou_Error || s:LastShellReturn_C != 0
+        return
+    endif
+    if expand("%:e") == "c" || expand("%:e") == "cpp" || expand("%:e") == "cxx"
+        let s:LastShellReturn_L = 0
+        let Sou = expand("%:p")
+        let Obj = expand("%:p:r").s:Obj_Extension
+        let Exe = expand("%:p:r")
+        let Exe_Name = expand("%:p:t:r")
+        let v:statusmsg = ''
+        if filereadable(Obj) && (getftime(Obj) >= getftime(Sou))
+            redraw!
+            if !executable(Exe) || (executable(Exe) && getftime(Exe) < getftime(Obj))
+                if expand("%:e") == "c"
+                    setlocal makeprg=gcc\ -o\ %<\ %<.o
+                    echohl WarningMsg | echo " linking..."
+                    silent make
+                elseif expand("%:e") == "cpp" || expand("%:e") == "cxx"
+                    exec ':setlocal makeprg='.s:linux_CPPLinkFlags
+                    echohl WarningMsg | echo " linking..."
+                    silent make
+                endif
+                redraw!
+                if v:shell_error != 0
+                    let s:LastShellReturn_L = v:shell_error
+                endif
+                if empty(v:statusmsg)
+                    echohl WarningMsg | echo " linking successful"
+                else
+                    exe ":bo cope"
+                endif
+            else
+                echohl WarningMsg | echo ""Exe_Name"is up to date"
+            endif
+        endif
+        setlocal makeprg=make
+    endif
+endfunc
+
+func! Run()
+    let s:ShowWarning = 0
+    call Link()
+    let s:ShowWarning = 1
+    if s:Sou_Error || s:LastShellReturn_C != 0 || s:LastShellReturn_L != 0
+        return
+    endif
+    let Sou = expand("%:p")
+    if expand("%:e") == "c" || expand("%:e") == "cpp" || expand("%:e") == "cxx"
+        let Obj = expand("%:p:r").s:Obj_Extension
+        let Exe = expand("%:p:r")
+        if executable(Exe) && getftime(Exe) >= getftime(Obj) && getftime(Obj) >= getftime(Sou)
+            redraw!
+            echohl WarningMsg | echo " running..."
+            exe ":!clear; ./%<"
+            redraw!
+            echohl WarningMsg | echo " running finish"
+        endif
+    endif
+endfunc
+
+func! Debug()
+    let s:ShowWarning = 0
+    call Link()
+    let s:ShowWarning = 1
+    if s:Sou_Error || s:LastShellReturn_C != 0 || s:LastShellReturn_L != 0
+        return
+    endif
+    let Sou = expand("%:p")
+    if expand("%:e") == "c" || expand("%:e") == "cpp" || expand("%:e") == "cxx"
+        let Obj = expand("%:p:r").s:Obj_Extension
+        let Exe = expand("%:p:r")
+        if executable(Exe) && getftime(Exe) >= getftime(Obj) && getftime(Obj) >= getftime(Sou)
+            exec "!clear; gdb ./%<"
+        endif
+    endif
+endfunc
+
+func! RunPython()
+    exec "w"
+    exec "!clear; python %"
+endfunc
+
+func! Clear()
+    exe "!rm ".expand("%<").'.o '.expand("%<")
+endfunc
+
+" -----------------------------------------------------------------------------
+"  < 其它配置 >
+" -----------------------------------------------------------------------------
+set writebackup                             "保存文件前建立备份，保存成功后删除该备份
+set nobackup                                "设置无备份文件
+" set noswapfile                              "设置无临时文件
+" set vb t_vb=                                "关闭提示音
+
+
+" =============================================================================
+"                          << 以下为常用工具配置 >>
+" =============================================================================
+
+" -----------------------------------------------------------------------------
+"  < cscope 工具配置 >
+" -----------------------------------------------------------------------------
+" 用Cscope自己的话说 - "你可以把它当做是超过频的ctags"
+if has("cscope")
+    "设定可以使用 quickfix 窗口来查看 cscope 结果
+    set cscopequickfix=s-,c-,d-,i-,t-,e-
+    "使支持用 Ctrl+]  和 Ctrl+t 快捷键在代码间跳转
+    set cscopetag
+    "如果你想反向搜索顺序设置为1
+    set csto=0
+    set cscopeverbose
+    "快捷键设置
+    nmap <C-\>s :cs find s <C-R>=expand("<cword>")<CR><CR>
+    nmap <C-\>g :cs find g <C-R>=expand("<cword>")<CR><CR>
+    nmap <C-\>c :cs find c <C-R>=expand("<cword>")<CR><CR>
+    nmap <C-\>t :cs find t <C-R>=expand("<cword>")<CR><CR>
+    nmap <C-\>e :cs find e <C-R>=expand("<cword>")<CR><CR>
+    nmap <C-\>f :cs find f <C-R>=expand("<cfile>")<CR><CR>
+    nmap <C-\>i :cs find i ^<C-R>=expand("<cfile>")<CR>$<CR>
+    nmap <C-\>d :cs find d <C-R>=expand("<cword>")<CR><CR>
+endif
+
+" -----------------------------------------------------------------------------
+"  < ctags 工具配置 >
+" -----------------------------------------------------------------------------
+" 对浏览代码非常的方便,可以在函数,变量之间跳转等
+set tags=./tags;                            "向上级目录递归查找tags文件（好像只有在Windows下才有用）
+
+" =============================================================================
+"                          << 以下为常用自动命令配置 >>
+" =============================================================================
+
+" 自动切换目录为当前编辑文件所在目录
+au BufRead,BufNewFile,BufEnter * cd %:p:h
+
+" =============================================================================
+"                          << 其它 >>
+" =============================================================================
+
+" 注：上面配置中的"<Leader>"在本软件中设置为"\"键（引号里的反斜杠），如<Leader>t
+" 指在常规模式下按"\"键加"t"键，这里不是同时按，而是先按"\"键后按"t"键，间隔在一
+" 秒内，而<Leader>cs是先按"\"键再按"c"又再按"s"键

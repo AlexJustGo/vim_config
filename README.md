@@ -3,8 +3,6 @@
 There are only two files in this repertory. 
 And this repertory exist in ~/.vim/vimrcs/
 
-There are only two files in this repertory. And this repertory exist in ~/.vim/vimrcs/
-
 bundle and vimrc.
 
 bundle:
